@@ -1,13 +1,22 @@
-using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(MeshCollider))]
 [ExecuteInEditMode]
+[RequireComponent(typeof(MeshRenderer)), RequireComponent(typeof(MeshFilter)), RequireComponent(typeof(MeshCollider))]
 public class Tile3D : MonoBehaviour
 {
+    [MenuItem("GameObject/3D Object/Tile3D")]
+    public static void CreateTile3D()
+    {
+        GameObject go = new GameObject("Tile3D");
+        var tile3d = go.AddComponent<Tile3D>();
+        // TODO: default material
+        var defaultMatPaths = AssetDatabase.FindAssets("Tile3DMaterial");
+        var tileMat = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(defaultMatPaths[0]));
+        tile3d.meshRenderer.material = tileMat;
+    }
+
     // sides of a cube
     public static Vector3[] Faces = new Vector3[6]
     {
@@ -59,7 +68,7 @@ public class Tile3D : MonoBehaviour
     private class MeshBuilder
     {
         public Mesh Mesh;
-        
+
         private List<Vector3> vertices = new List<Vector3>();
         private List<Vector2> uvs = new List<Vector2>();
         private List<int> triangles = new List<int>();
@@ -80,7 +89,7 @@ public class Tile3D : MonoBehaviour
         {
             this.uvTileSize = uvTileSize;
             this.tilePadding = tilePadding;
-            
+
             vertices.Clear();
             uvs.Clear();
             triangles.Clear();
@@ -129,7 +138,7 @@ public class Tile3D : MonoBehaviour
                 uvs.Add(uvc);
                 uvs.Add(uvd);
             }
-            
+
             // Add Triangles
             triangles.Add(start + 0);
             triangles.Add(start + 1);
@@ -145,6 +154,7 @@ public class Tile3D : MonoBehaviour
             Mesh.vertices = vertices.ToArray();
             Mesh.uv = uvs.ToArray();
             Mesh.triangles = triangles.ToArray();
+            Unwrapping.GenerateSecondaryUVSet(Mesh);
             Mesh.RecalculateBounds();
             Mesh.RecalculateNormals();
         }
@@ -189,7 +199,7 @@ public class Tile3D : MonoBehaviour
         meshFiler = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
         meshCollider = GetComponent<MeshCollider>();
-        
+
         // create initial mesh
         if (renderMeshBuilder == null)
         {
@@ -297,7 +307,7 @@ public class Tile3D : MonoBehaviour
         var up = Vector3.down;
         if (normal.y != 0)
             up = Vector2.left;
-        
+
         var front = center + normal * 0.5f;
         var perp1 = Vector3.Cross(normal, up);
         var perp2 = Vector3.Cross(perp1, normal);
