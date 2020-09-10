@@ -1,0 +1,14 @@
+{
+    "name": "com.epiplon.tile3d",
+    "version": "0.1.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/epiplon-game-studio/UnityTile3D.git"
+    },
+    "author": "Noel FB, Epiplon",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/epiplon-game-studio/UnityTile3D/issues"
+    },
+    "homepage": "https://github.com/epiplon-game-studio/UnityTile3D#readme"
+}
