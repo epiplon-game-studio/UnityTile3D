@@ -19,6 +19,7 @@ public class Tile3DEditor : Editor
     // active selections
     private SingleSelection hover = null;
     private MultiSelection selected = new MultiSelection();
+    private bool draggingBlock;
 
     private void OnSceneGUI()
     {
@@ -49,15 +50,31 @@ public class Tile3DEditor : Editor
     void BuildingMode()
     {
         var e = Event.current;
-
+        Tools.current = Tool.None;
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
         Handles.color = Color.blue;
         hover = GetSelectionAt(e.mousePosition);
 
+        // Draw only
+        if (hover != null)
+            DrawSelection(hover, new Color(0, 0, 1f, 0.25f), Color.blue);
+
+        if (selected != null && !selected.IsEmpty)
+        {
+            DrawSelection(selected, new Color(0, 0, 1f, 0.5f), Color.clear);
+            EditorGUI.BeginChangeCheck();
+            var start = CenterOfSelection(selected);
+            var pulled = Handles.Slider(start, selected.Face * 0.5f);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(target, "Edit Mesh");
+                MoveBlockAction(start, pulled);
+            }
+        }
+
         // only during hovering
         if (hover != null)
         {
-            DrawSelection(hover, new Color(0, 0, 1f, 0.25f), Color.blue);
             // mark tile as selected when clicked
             if (LeftButtonClick)
             {
@@ -78,22 +95,51 @@ public class Tile3DEditor : Editor
                 }
             }
         }
-
-        if (selected != null && !selected.IsEmpty)
+        else
         {
-            DrawSelection(selected, new Color(0, 0, 1f, 0.5f), Color.clear);
-            var start = CenterOfSelection(selected);
-            var pulled = Handles.Slider(start, selected.Face);
+            if (LeftButtonClick)
+                selected.Clear();
         }
 
         Selection.activeGameObject = tiler.transform.gameObject;
     }
-
     void PaintingMode()
     {
 
     }
 
+    #endregion
+
+    #region Actions
+    void MoveBlockAction(Vector3 start, Vector3 pulled)
+    {
+        // get distance and direction
+        var distance = (pulled - start).magnitude;
+        var outwards = (int)Mathf.Sign(Vector3.Dot(pulled - start, selected.Face));
+
+        using (TileProfiler.DragginBlocks.Auto())
+        {
+            // create or destroy a block (depending on direction)
+            if (distance > 1f)
+            {
+                for (int i = 0; i < selected.Tiles.Count; i++)
+                {
+                    var tile = selected.Tiles[i];
+                    var was = tile;
+                    var next = tile + selected.Face.Int() * outwards;
+
+                    if (outwards > 0)
+                        tiler.Create(next, was);
+                    else
+                        tiler.Destroy(was);
+
+                    selected.Tiles[i] = next;
+                }
+
+                tiler.Rebuild();
+            }
+        }
+    }
     #endregion
 
     #region Selection
@@ -116,6 +162,12 @@ public class Tile3DEditor : Editor
                 Face = selection.Face;
 
             Tiles.Add(selection.Tile);
+        }
+
+        public void Clear()
+        {
+            Tiles.Clear();
+            Face = Vector3.zero;
         }
     }
 

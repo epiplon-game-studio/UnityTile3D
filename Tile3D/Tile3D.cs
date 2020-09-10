@@ -276,10 +276,12 @@ public class Tile3D : MonoBehaviour
                 map.Add(cell.Tile, cell);
     }
 
-    public void Rebuild()
+    public void Rebuild(bool rebuildCollision = true)
     {
         renderMeshBuilder.Begin(UVTileSize, TilePadding);
-        colliderMeshBuilder.Begin(UVTileSize, TilePadding);
+
+        if(rebuildCollision)
+            colliderMeshBuilder.Begin(UVTileSize, TilePadding);
 
         // generate each block
         foreach (var block in Blocks)
@@ -295,11 +297,19 @@ public class Tile3D : MonoBehaviour
         }
 
         renderMeshBuilder.End();
-        colliderMeshBuilder.End();
+
+        if(rebuildCollision)
+            colliderMeshBuilder.End();
 
         meshFiler.sharedMesh = renderMeshBuilder.Mesh;
-        meshCollider.sharedMesh = null;
-        meshCollider.sharedMesh = colliderMeshBuilder.Mesh;
+        if(rebuildCollision)
+        {
+            meshCollider.sharedMesh = null;
+            meshCollider.sharedMesh = colliderMeshBuilder.Mesh;
+        }
+
+        gameObject.hideFlags = HideFlags.None;
+        meshCollider.hideFlags = HideFlags.HideInHierarchy | HideFlags.NotEditable;
     }
 
     private void BuildFace(Vector3 center, Block block, Vector3 normal, Face face)
