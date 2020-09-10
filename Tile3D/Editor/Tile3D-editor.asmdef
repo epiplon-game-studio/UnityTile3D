@@ -1,0 +1,17 @@
+{
+    "name": "Tile3D-editor",
+    "references": [
+        "GUID:5843fa269b5615f4981c8de34fc34cca"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
