@@ -26,6 +26,19 @@ public class Tile3DEditor : Editor
 
         Handles.BeginGUI();
         toolMode = (ToolModes)GUI.Toolbar(new Rect(10, 10, 200, 30), (int)toolMode, new[] { "Move", "Build", "Paint" });
+        switch (toolMode)
+        {
+            case ToolModes.Transform:
+                break;
+            case ToolModes.Building:
+                GUI.Label(new Rect(10, 40, 200, 30), "Left-click to select tile.");
+                GUI.Label(new Rect(10, 70, 200, 30), "Hold SHIFT for multiple selection.");
+                break;
+            case ToolModes.Painting:
+                break;
+            default:
+                break;
+        }
         Handles.EndGUI();
         switch (toolMode)
         {
@@ -78,21 +91,30 @@ public class Tile3DEditor : Editor
             // mark tile as selected when clicked
             if (LeftButtonClick)
             {
-                var index = selected.Tiles.FindIndex(t => t == hover.Tile && selected.Face == hover.Face);
-                if (index >= 0)
+                if (e.shift)
                 {
-                    selected.Tiles.RemoveAt(index);
+                    var index = selected.Tiles.FindIndex(t => t == hover.Tile && selected.Face == hover.Face);
+                    if (index >= 0)
+                    {
+                        selected.Tiles.RemoveAt(index);
+                    }
+                    else
+                    {
+                        if (selected.IsEmpty || hover.Face == selected.Face)
+                            selected.Add(hover);
+                        else
+                        {
+                            selected.Clear();
+                            selected.Add(hover);
+                        }
+                    }
                 }
                 else
                 {
-                    if (selected.IsEmpty || hover.Face == selected.Face)
-                        selected.Add(hover);
-                    else
-                    {
-                        selected.Tiles.Clear();
-                        selected.Add(hover);
-                    }
+                    selected.Clear();
+                    selected.Add(hover);
                 }
+
             }
         }
         else
