@@ -1,8 +1,9 @@
 {
     "name": "com.epiplon.tile3d",
     "displayName": "Tile3D",
+    "description": "Create 3D tiles.",
     "unity": "2019.4",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "category": "editor extensions",
     "dependencies": {},
     "repository": {

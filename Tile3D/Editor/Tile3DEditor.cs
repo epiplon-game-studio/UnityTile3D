@@ -145,6 +145,7 @@ namespace tile3d.editor
         void PaintingMode()
         {
             Tools.current = Tool.None;
+            HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
             hover = GetSelectionAt(e.mousePosition);
 
             if (hover!= null)
@@ -370,7 +371,6 @@ namespace tile3d.editor
             return changed;
         }
         #endregion
-
 
         #region Selection
         // used to describe a selection (tile + face)
