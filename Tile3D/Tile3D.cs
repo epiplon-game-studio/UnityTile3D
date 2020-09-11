@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace tile3d
@@ -8,6 +10,7 @@ namespace tile3d
     [RequireComponent(typeof(MeshRenderer)), RequireComponent(typeof(MeshFilter)), RequireComponent(typeof(MeshCollider))]
     public class Tile3D : MonoBehaviour
     {
+#if UNITY_EDITOR
         [MenuItem("GameObject/3D Object/Tile3D")]
         public static void CreateTile3D()
         {
@@ -333,5 +336,6 @@ namespace tile3d
             colliderMeshBuilder.Quad(a, b, c, d, face);
         }
 
+#endif
     }
 }
